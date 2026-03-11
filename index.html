@@ -1,46 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Lottery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骞歌繍鎶藉</title>
     <style>
-        body { font-family: Arial; text-align: center; background: #f0f0f0; margin: 0; padding: 20px; }
-        .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 10px; }
-        .wheel { width: 200px; height: 200px; border: 3px solid #333; border-radius: 50%; margin: 20px auto; background: linear-gradient(0deg, red 0%, red 20%, blue 20%, blue 40%, green 40%, green 60%, yellow 60%, yellow 80%, orange 80%, orange 100%); }
-        .btn { background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; margin: 10px; }
-        .result { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; }
+        h1 { color: #667eea; margin-bottom: 30px; font-size: 28px; }
+        .wheel-area { position: relative; width: 280px; height: 280px; margin: 0 auto 30px; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); border: 8px solid #2c3e50; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
+        .wheel-section { position: absolute; width: 50%; height: 50%; transform-origin: right bottom; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); font-size: 14px; overflow: hidden; }
+        .wheel-text { transform: rotate(45deg); text-align: center; width: 80px; }
+        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e74c3c; z-index: 10; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); }
+        .spin-btn { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border: none; padding: 18px 40px; font-size: 20px; border-radius: 50px; cursor: pointer; margin: 20px 0; transition: all 0.3s; box-shadow: 0 5px 15px rgba(238, 90, 36, 0.4); }
+        .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(238, 90, 36, 0.6); }
+        .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .result { margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; display: none; border-left: 5px solid #28a745; }
+        .prize-name { font-size: 24px; color: #e74c3c; font-weight: bold; margin: 10px 0; }
+        .fireworks { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Lottery Game</h1>
-        <div class="wheel"></div>
-        <button class="btn" onclick="spin()">Start Spin</button>
+        <h1>馃帀 骞歌繍澶ц浆鐩?馃帀</h1>
+        
+        <div class="wheel-area">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- 杞洏鎵囧舰鍖哄煙 -->
+            </div>
+        </div>
+        
+        <button class="spin-btn" id="spinBtn" onclick="spin()">馃幆 寮€濮嬫娊濂?/button>
+        
         <div class="result" id="result">
-            <h3>You got: <span id="prize"></span></h3>
+            <h3>馃帄 鎭枩鎮ㄨ幏寰?/h3>
+            <div class="prize-name" id="prizeName"></div>
+            <p>绁濇偍涓嬫濂借繍锛?/p>
         </div>
     </div>
 
     <script>
-        var prizes = ["First Prize", "Second Prize", "Third Prize", "Fourth Prize", "Thanks"];
-        
-        function spin() {
-            var btn = document.querySelector('.btn');
-            var result = document.getElementById('result');
-            var prizeSpan = document.getElementById('prize');
+        const prizes = [
+            { name: "馃摫 涓€绛夊 iPhone 15", color: "#e74c3c", prob: 5 },
+            { name: "馃帶 浜岀瓑濂?AirPods Pro", color: "#3498db", prob: 10 },
+            { name: "馃挵 涓夌瓑濂?浜笢鍗?00鍏?, color: "#f39c12", prob: 15 },
+            { name: "馃攱 鍥涚瓑濂?灏忕背鍏呯數瀹?, color: "#27ae60", prob: 20 },
+            { name: "馃槉 浜旂瓑濂?璋㈣阿鍙備笌", color: "#9b59b6", prob: 50 }
+        ];
+
+        let isSpinning = false;
+
+        function initWheel() {
+            const wheel = document.getElementById('wheel');
+            const anglePerPrize = 360 / prizes.length;
             
-            btn.disabled = true;
-            btn.textContent = 'Spinning...';
+            wheel.innerHTML = '';
+            
+            prizes.forEach((prize, index) => {
+                const section = document.createElement('div');
+                section.className = 'wheel-section';
+                section.style.backgroundColor = prize.color;
+                section.style.transform = `rotate(${index * anglePerPrize}deg)`;
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'wheel-text';
+                textDiv.textContent = prize.name.split(' ')[1] || prize.name;
+                textDiv.style.fontSize = anglePerPrize < 60 ? '12px' : '14px';
+                
+                section.appendChild(textDiv);
+                wheel.appendChild(section);
+            });
+        }
+
+        function spin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const spinBtn = document.getElementById('spinBtn');
+            const result = document.getElementById('result');
+            const prizeName = document.getElementById('prizeName');
+            const wheel = document.getElementById('wheel');
+            
+            spinBtn.disabled = true;
+            spinBtn.textContent = '馃幉 鎶藉涓?..';
             result.style.display = 'none';
             
-            setTimeout(function(){
-                var random = Math.floor(Math.random() * prizes.length);
-                prizeSpan.textContent = prizes[random];
+            // 鎸夋鐜囬€夋嫨濂栧搧
+            const random = Math.random() * 100;
+            let cumulativeProb = 0;
+            let selectedPrize = prizes[prizes.length - 1];
+            
+            for (let prize of prizes) {
+                cumulativeProb += prize.prob;
+                if (random <= cumulativeProb) {
+                    selectedPrize = prize;
+                    break;
+                }
+            }
+            
+            // 璁＄畻鏃嬭浆瑙掑害
+            const anglePerPrize = 360 / prizes.length;
+            const targetIndex = prizes.indexOf(selectedPrize);
+            const spins = 6; // 杞?鍦?            const finalAngle = spins * 360 + (360 - (targetIndex * anglePerPrize + anglePerPrize/2));
+            
+            // 鎵ц鏃嬭浆
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
+            
+            // 鏄剧ず缁撴灉
+            setTimeout(() => {
+                prizeName.textContent = selectedPrize.name;
                 result.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Spin Again';
-            }, 2000);
+                spinBtn.disabled = false;
+                spinBtn.textContent = '馃幆 鍐嶆鎶藉';
+                isSpinning = false;
+                
+                // 绠€鍗曠殑搴嗙鏁堟灉
+                if (selectedPrize.prob <= 15) {
+                    document.body.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+                    setTimeout(() => {
+                        document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    }, 1000);
+                }
+            }, 4000);
         }
+
+        window.onload = function() {
+            initWheel();
+        };
     </script>
 </body>
 </html>
