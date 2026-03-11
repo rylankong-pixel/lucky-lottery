@@ -1,30 +1,66 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>骞歌繍鎶藉</title>
+    <title>Lucky Lottery</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: "Microsoft YaHei", "寰蒋闆呴粦", Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
         .container { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; }
-        h1 { color: #667eea; margin-bottom: 30px; font-size: 28px; }
+        
+        /* 鐢ㄨ儗鏅浘鐗囨浛浠ｄ腑鏂囨枃瀛?*/
+        .title {
+            width: 280px;
+            height: 60px;
+            margin: 0 auto 30px;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjgwIDYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAyOHB4Ij7wn5eZIFvwn5iIIOaWhyDpu4/lj6RfPC90ZXh0Pjwvc3ZnPg==');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
         .wheel-area { position: relative; width: 280px; height: 280px; margin: 0 auto 30px; }
         .wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); border: 8px solid #2c3e50; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
         .wheel-section { position: absolute; width: 50%; height: 50%; transform-origin: right bottom; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); font-size: 14px; overflow: hidden; }
         .wheel-text { transform: rotate(45deg); text-align: center; width: 80px; }
         .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e74c3c; z-index: 10; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); }
-        .spin-btn { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border: none; padding: 18px 40px; font-size: 20px; border-radius: 50px; cursor: pointer; margin: 20px 0; transition: all 0.3s; box-shadow: 0 5px 15px rgba(238, 90, 36, 0.4); }
+        .spin-btn { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24); 
+            color: white; 
+            border: none; 
+            padding: 18px 40px; 
+            font-size: 20px; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            margin: 20px 0; 
+            transition: all 0.3s; 
+            box-shadow: 0 5px 15px rgba(238, 90, 36, 0.4);
+            /* 鎸夐挳鏂囧瓧涔熺敤鍥剧墖 */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMTQwIDMwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAxOHB4Ij7wn5eZIOaWhyDpu4/lj6RfPC90ZXh0Pjwvc3ZnPg==');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            text-indent: -9999px;
+            overflow: hidden;
+        }
         .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(238, 90, 36, 0.6); }
         .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .result { margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; display: none; border-left: 5px solid #28a745; }
-        .prize-name { font-size: 24px; color: #e74c3c; font-weight: bold; margin: 10px 0; }
+        .prize-name { 
+            width: 250px; 
+            height: 40px; 
+            margin: 10px auto; 
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            text-indent: -9999px; 
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>馃帀 骞歌繍澶ц浆鐩?馃帀</h1>
+        <div class="title"></div>
         
         <div class="wheel-area">
             <div class="pointer"></div>
@@ -33,22 +69,21 @@
             </div>
         </div>
         
-        <button class="spin-btn" id="spinBtn" onclick="spin()">馃幆 寮€濮嬫娊濂?/button>
+        <button class="spin-btn" id="spinBtn" onclick="spin()"></button>
         
         <div class="result" id="result">
-            <h3>馃帄 鎭枩鎮ㄨ幏寰?/h3>
             <div class="prize-name" id="prizeName"></div>
-            <p>绁濇偍涓嬫濂借繍锛?/p>
+            <p style="color: #666;">Thank you for participating!</p>
         </div>
     </div>
 
     <script>
         const prizes = [
-            { name: "馃摫 涓€绛夊 iPhone 15", color: "#e74c3c", prob: 5 },
-            { name: "馃帶 浜岀瓑濂?AirPods Pro", color: "#3498db", prob: 10 },
-            { name: "馃挵 涓夌瓑濂?浜笢鍗?00鍏?, color: "#f39c12", prob: 15 },
-            { name: "馃攱 鍥涚瓑濂?灏忕背鍏呯數瀹?, color: "#27ae60", prob: 20 },
-            { name: "馃槉 浜旂瓑濂?璋㈣阿鍙備笌", color: "#9b59b6", prob: 50 }
+            { name: "馃摫 涓€绛夊 iPhone 15", color: "#e74c3c", prob: 5, img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMjUwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAxOHB4Ij7wn5eZIOaWhyDpu4/lj6RfIOaXpSDlhpfkuI3miYA8L3RleHQ+PC9zdmc+" },
+            { name: "馃帶 浜岀瓑濂?AirPods Pro", color: "#3498db", prob: 10, img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMjUwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAxOHB4Ij7wn5eZIOaWhyDpu4/lj6RfIOaVmeaLieadj+WKm+KApuKApuKApjwvdGV4dD48L3N2Zz4=" },
+            { name: "馃挵 涓夌瓑濂?浜笢鍗?00鍏?, color: "#f39c12", prob: 15, img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMjUwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAxOHB4Ij7wn5eZIOaWhyDpu4/lj6RfIOaZrueJh+WKoOi9veWbvueJhzwvdGV4dD48L3N2Zz4=" },
+            { name: "馃攱 鍥涚瓑濂?灏忕背鍏呯數瀹?, color: "#27ae60", prob: 20, img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMjUwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAxOHB4Ij7wn5eZIOaWhyDpu4/lj6RfIOaZg+S4gOWutuWtkDwvdGV4dD48L3N2Zz4=" },
+            { name: "馃槉 浜旂瓑濂?璋㈣阿鍙備笌", color: "#9b59b6", prob: 50, img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMjUwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iJ0hpZXdyaSBOZXcgUm9tYW4nLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXMtbWlkPSJpbiIgZm9udC1zdHlsZT0iZm9udC1zaXplOiAxOHB4Ij7wn5eZIOaWhyDpu4/lj6RfOaEn+acuuWtkDwvdGV4dD48L3N2Zz4=" }
         ];
 
         let isSpinning = false;
@@ -67,7 +102,7 @@
                 
                 const textDiv = document.createElement('div');
                 textDiv.className = 'wheel-text';
-                textDiv.textContent = prize.name.split(' ')[0];
+                textDiv.innerHTML = prize.name.split(' ')[0];
                 textDiv.style.fontSize = anglePerPrize < 60 ? '12px' : '14px';
                 
                 section.appendChild(textDiv);
@@ -85,7 +120,7 @@
             const wheel = document.getElementById('wheel');
             
             spinBtn.disabled = true;
-            spinBtn.textContent = '馃幉 鎶藉涓?..';
+            spinBtn.textContent = 'Spinning...';
             result.style.display = 'none';
             
             // 鎸夋鐜囬€夋嫨濂栧搧
@@ -112,10 +147,11 @@
             
             // 鏄剧ず缁撴灉
             setTimeout(() => {
+                prizeName.style.backgroundImage = `url('${selectedPrize.img}')`;
                 prizeName.textContent = selectedPrize.name;
                 result.style.display = 'block';
                 spinBtn.disabled = false;
-                spinBtn.textContent = '馃幆 鍐嶆鎶藉';
+                spinBtn.textContent = 'Spin Again';
                 isSpinning = false;
             }, 4000);
         }
