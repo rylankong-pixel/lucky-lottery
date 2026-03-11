@@ -1,45 +1,44 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>鎶藉</title>
+    <title>Lottery</title>
     <style>
-        body { font-family: Arial; text-align: center; background: #f0f0f0; }
+        body { font-family: Arial; text-align: center; background: #f0f0f0; margin: 0; padding: 20px; }
         .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 10px; }
-        .wheel { width: 200px; height: 200px; border: 3px solid #333; border-radius: 50%; margin: 20px auto; position: relative; background: conic-gradient(red 0deg 72deg, blue 72deg 144deg, green 144deg 216deg, yellow 216deg 288deg, orange 288deg 360deg); }
-        .btn { background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; }
-        .result { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .wheel { width: 200px; height: 200px; border: 3px solid #333; border-radius: 50%; margin: 20px auto; background: linear-gradient(0deg, red 0%, red 20%, blue 20%, blue 40%, green 40%, green 60%, yellow 60%, yellow 80%, orange 80%, orange 100%); }
+        .btn { background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; margin: 10px; }
+        .result { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>馃帀 鎶藉</h1>
+        <h1>Lottery Game</h1>
         <div class="wheel"></div>
-        <button class="btn" onclick="spin()">寮€濮嬫娊濂?/button>
-        <div class="result" id="result" style="display:none;">
-            <h3>鎭枩鑾峰緱锛?span id="prize"></span></h3>
+        <button class="btn" onclick="spin()">Start Spin</button>
+        <div class="result" id="result">
+            <h3>You got: <span id="prize"></span></h3>
         </div>
     </div>
 
     <script>
-        const prizes = ["涓€绛夊", "浜岀瓑濂?, "涓夌瓑濂?, "鍥涚瓑濂?, "璋㈣阿鍙備笌"];
+        var prizes = ["First Prize", "Second Prize", "Third Prize", "Fourth Prize", "Thanks"];
         
         function spin() {
-            const btn = document.querySelector('.btn');
-            const result = document.getElementById('result');
-            const prizeSpan = document.getElementById('prize');
+            var btn = document.querySelector('.btn');
+            var result = document.getElementById('result');
+            var prizeSpan = document.getElementById('prize');
             
             btn.disabled = true;
-            btn.textContent = '鎶藉涓?..';
+            btn.textContent = 'Spinning...';
             result.style.display = 'none';
             
-            setTimeout(() => {
-                const random = Math.floor(Math.random() * prizes.length);
+            setTimeout(function(){
+                var random = Math.floor(Math.random() * prizes.length);
                 prizeSpan.textContent = prizes[random];
                 result.style.display = 'block';
                 btn.disabled = false;
-                btn.textContent = '鍐嶆潵涓€娆?;
+                btn.textContent = 'Spin Again';
             }, 2000);
         }
     </script>
