@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -31,7 +31,7 @@
         h1 {
             color: #667eea;
             margin-bottom: 20px;
-            font-size: 28px;
+            font-size: 24px;
         }
         .wheel-container {
             position: relative;
@@ -45,19 +45,23 @@
             border-radius: 50%;
             position: relative;
             overflow: hidden;
-            transition: transform 3s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: transform 3s ease-out;
+            border: 3px solid #333;
         }
         .wheel-section {
             position: absolute;
             width: 50%;
             height: 50%;
-            transform-origin: 100% 100%;
+            transform-origin: right bottom;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             color: white;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-size: 12px;
+            padding-left: 20px;
+            padding-bottom: 10px;
         }
         .spin-btn {
             background: linear-gradient(45deg, #ff6b6b, #ee5a24);
@@ -84,6 +88,18 @@
             border-radius: 10px;
             display: none;
         }
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ff4757;
+            z-index: 10;
+        }
         .prizes {
             margin: 20px 0;
             text-align: left;
@@ -101,6 +117,7 @@
         <h1>馃帀 骞歌繍鎶藉 馃帀</h1>
         
         <div class="wheel-container">
+            <div class="pointer"></div>
             <div class="wheel" id="wheel">
                 <!-- 杞洏鎵囧舰鍖哄煙灏嗛€氳繃JS鐢熸垚 -->
             </div>
@@ -137,13 +154,14 @@
             wheel.innerHTML = '';
             prizeList.innerHTML = '';
             
-            let currentAngle = 0;
+            const anglePerPrize = 360 / prizes.length;
+            
             prizes.forEach((prize, index) => {
                 // 鍒涘缓杞洏鎵囧舰
                 const section = document.createElement('div');
                 section.className = 'wheel-section';
                 section.style.backgroundColor = prize.color;
-                section.style.transform = `rotate(${currentAngle}deg) skewY(-${90 - 360/prizes.length}deg)`;
+                section.style.transform = `rotate(${index * anglePerPrize}deg)`;
                 section.textContent = prize.name.split(' ')[0];
                 wheel.appendChild(section);
                 
@@ -152,8 +170,6 @@
                 item.className = 'prize-item';
                 item.innerHTML = `<span>${prize.name}</span><span>${prize.probability}%</span>`;
                 prizeList.appendChild(item);
-                
-                currentAngle += 360 / prizes.length;
             });
         }
 
@@ -172,7 +188,8 @@
             
             // 闅忔満閫夋嫨濂栧搧锛堟寜姒傜巼锛?            const random = Math.random() * 100;
             let cumulativeProb = 0;
-            let selectedPrize = prizes[prizes.length - 1]; // 榛樿鏈€鍚庝竴涓?            
+            let selectedPrize = prizes[prizes.length - 1];
+            
             for (let prize of prizes) {
                 cumulativeProb += prize.probability;
                 if (random <= cumulativeProb) {
@@ -182,13 +199,13 @@
             }
             
             // 璁＄畻鏃嬭浆瑙掑害
-            const sectionAngle = 360 / prizes.length;
-            const targetSection = prizes.indexOf(selectedPrize);
-            const baseRotation = 360 * 5; // 鍩虹鏃嬭浆5鍦?            const finalAngle = baseRotation + (targetSection * sectionAngle) + (sectionAngle / 2);
+            const anglePerPrize = 360 / prizes.length;
+            const targetIndex = prizes.indexOf(selectedPrize);
+            const spins = 5; // 杞?鍦?            const finalAngle = spins * 360 + (360 - (targetIndex * anglePerPrize + anglePerPrize/2));
             
             // 鎵ц鏃嬭浆鍔ㄧ敾
             const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${-finalAngle}deg)`;
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
             
             // 鏄剧ず缁撴灉
             setTimeout(() => {
@@ -197,23 +214,8 @@
                 spinBtn.disabled = false;
                 spinBtn.textContent = '鍐嶆鎶藉';
                 isSpinning = false;
-                
-                // 淇濆瓨涓璁板綍
-                saveResult(selectedPrize);
             }, 3000);
         }
-
-        // 淇濆瓨涓璁板綍
-        function saveResult(prize) {
-            const record = {
-                prize: prize.name,
-                time: new Date().toLocaleString(),
-                id: Date.now()
-            };
-            
-            let records = JSON.parse(localStorage.getItem('lotteryRecords') || '[]');
-            records.unshift(record);
-            localStorage.setItem('lotteryRecords', JSON.stringify(records.slice(0, 10))); // 淇濈暀鏈€杩?0鏉?        }
 
         // 椤甸潰鍔犺浇鏃跺垵濮嬪寲
         window.onload = function() {
